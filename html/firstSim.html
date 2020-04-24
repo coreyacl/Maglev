@@ -67,42 +67,43 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 
 
   </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">Magnetic Levitation Project</a></li><li><a href="#2">Visualize system</a></li></ul></div><h2 id="1">Magnetic Levitation Project</h2><p>Corey and Eamon</p><pre class="codeinput"><span class="comment">%Define variable for the system</span>
-mu = 1;
-q1 = 1;
-N = 10;
-A = 0.001;
-R = 0.1;
-L = 1;
-g = -9.81;
+<span class="comment">%https://www.daycounter.com/Calculators/Magnets/Solenoid-Force-Calculator.phtml</span>
+<span class="comment">%based off of https://media.digikey.com/pdf/Data%20Sheets/Adafruit%20PDFs/3875_Web.pdf</span>
+mu = pi*4e-7;   <span class="comment">% permeability of space</span>
+q1 = .01;       <span class="comment">% Magnetic force of small magnet in Teslas</span>
+N = 4000;       <span class="comment">% # of turns in solenoid</span>
+A = 60;         <span class="comment">% Area of solenoid in mm^2</span>
+R = 8.66;       <span class="comment">% Internal resistance of solenoid (5V/.6A) in Ohms</span>
+g = -9.81;      <span class="comment">% Acceleration due to gravity</span>
 
 <span class="comment">%The setpoints for the linerization</span>
 <span class="comment">%First we chose our 'b' setpoint for voltage</span>
 <span class="comment">%And find an a that cancels out the constant</span>
 b = 5;
-a = abs(sqrt((5*mu*q1*N*A)/(4*pi*R*L*g)))
+a = abs(sqrt((5*mu*q1*N*A)/(4*pi*R*g)))
 
 <span class="comment">%Z allows us to use cleaner math by placing</span>
 <span class="comment">%all of our constants into one constant.</span>
-Z = (mu*q1*N*A)/(4*pi*R*L)
+Z = (mu*q1*N*A)/(4*pi*R)
 
 <span class="comment">%Define the system</span>
 sys = tf([Z/a^2],[1 0 Z*b/a^3])
 </pre><pre class="codeoutput">
 a =
 
-    0.0637
+    0.0038
 
 
 Z =
 
-    0.0080
+   2.7714e-05
 
 
 sys =
  
     1.962
-  ---------
-  s^2 + 154
+  ----------
+  s^2 + 2610
  
 Continuous-time transfer function.
 
@@ -112,8 +113,7 @@ pzmap(sys)
 figure
 step(sys)
 
-<span class="comment">% step(sys)</span>
-
+<span class="comment">%open loop</span>
 Gol = sys-(0.001*9.8)
 
 figure
@@ -121,9 +121,9 @@ pzmap(Gol)
 </pre><pre class="codeoutput">
 Gol =
  
-  -0.0098 s^2 + 0.4524
-  --------------------
-       s^2 + 154
+  -0.0098 s^2 - 23.62
+  -------------------
+      s^2 + 2610
  
 Continuous-time transfer function.
 
@@ -134,23 +134,24 @@ Continuous-time transfer function.
 
 
 %Define variable for the system
-mu = 1;
-q1 = 1;
-N = 10;
-A = 0.001;
-R = 0.1;
-L = 1;
-g = -9.81;
+%https://www.daycounter.com/Calculators/Magnets/Solenoid-Force-Calculator.phtml
+%based off of https://media.digikey.com/pdf/Data%20Sheets/Adafruit%20PDFs/3875_Web.pdf
+mu = pi*4e-7;   % permeability of space
+q1 = .01;       % Magnetic force of small magnet in Teslas
+N = 4000;       % # of turns in solenoid
+A = 60;         % Area of solenoid in mm^2
+R = 8.66;       % Internal resistance of solenoid (5V/.6A) in Ohms
+g = -9.81;      % Acceleration due to gravity 
 
 %The setpoints for the linerization
 %First we chose our 'b' setpoint for voltage
 %And find an a that cancels out the constant
 b = 5;
-a = abs(sqrt((5*mu*q1*N*A)/(4*pi*R*L*g)))
+a = abs(sqrt((5*mu*q1*N*A)/(4*pi*R*g)))
 
 %Z allows us to use cleaner math by placing
 %all of our constants into one constant.
-Z = (mu*q1*N*A)/(4*pi*R*L)
+Z = (mu*q1*N*A)/(4*pi*R)
 
 %Define the system
 sys = tf([Z/a^2],[1 0 Z*b/a^3])
@@ -162,8 +163,7 @@ pzmap(sys)
 figure
 step(sys)
 
-% step(sys)
-
+%open loop
 Gol = sys-(0.001*9.8)
 
 figure
