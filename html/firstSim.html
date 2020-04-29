@@ -6,7 +6,7 @@
    <!--
 This HTML was auto-generated from MATLAB code.
 To make changes, update the MATLAB code and republish this document.
-      --><title>firstSim</title><meta name="generator" content="MATLAB 9.7"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2020-04-24"><meta name="DC.source" content="firstSim.m"><style type="text/css">
+      --><title>firstSim</title><meta name="generator" content="MATLAB 9.7"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2020-04-29"><meta name="DC.source" content="firstSim.m"><style type="text/css">
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
 
 html { min-height:100%; margin-bottom:1px; }
@@ -66,7 +66,7 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 
 
 
-  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">Magnetic Levitation Project</a></li><li><a href="#2">Visualize system</a></li></ul></div><h2 id="1">Magnetic Levitation Project</h2><p>Corey and Eamon</p><pre class="codeinput"><span class="comment">%Define variable for the system</span>
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">Magnetic Levitation Project</a></li><li><a href="#2">Closed Loop</a></li></ul></div><h2 id="1">Magnetic Levitation Project</h2><p>Corey and Eamon</p><pre class="codeinput"><span class="comment">%Define variable for the system</span>
 <span class="comment">%https://www.daycounter.com/Calculators/Magnets/Solenoid-Force-Calculator.phtml</span>
 <span class="comment">%based off of https://media.digikey.com/pdf/Data%20Sheets/Adafruit%20PDFs/3875_Web.pdf</span>
 mu = pi*4e-7;   <span class="comment">% permeability of space</span>
@@ -80,54 +80,49 @@ g = -9.81;      <span class="comment">% Acceleration due to gravity</span>
 <span class="comment">%First we chose our 'b' setpoint for voltage</span>
 <span class="comment">%And find an a that cancels out the constant</span>
 b = 5;
-a = abs(sqrt((5*mu*q1*N*A)/(4*pi*R*g)))
+a = abs(sqrt((5*mu*q1*N*A)/(4*pi*R*g)));
 
 <span class="comment">%Z allows us to use cleaner math by placing</span>
 <span class="comment">%all of our constants into one constant.</span>
-Z = (mu*q1*N*A)/(4*pi*R)
+Z = (mu*q1*N*A)/(4*pi*R);
 
 <span class="comment">%Define the system</span>
-sys = tf([Z/a^2],[1 0 Z*b/a^3])
+G = tf([Z/a^2],[1 0 Z*b/a^3]);
+</pre><h2 id="2">Closed Loop</h2><pre class="codeinput">close <span class="string">all</span>
+
+k = 354;
+kd = 1;
+kp = 200;
+ki = 10e3;
+H = 1;
+C = tf([kd,kp,ki],[1,0]);
+C = C*k
+
+<span class="comment">% Visualize system</span>
+<span class="comment">% open loop</span>
+Gol = C*G*H;
+
+<span class="comment">% close loop</span>
+CL = (C*G)/(1+C*G*H);
+
+figure
+subplot(2,1,1)
+pzmap(CL)
+subplot(2,1,2)
+rlocus(Gol)
+
+figure
+step(CL)
 </pre><pre class="codeoutput">
-a =
-
-    0.0038
-
-
-Z =
-
-   2.7714e-05
-
-
-sys =
+C =
  
-    1.962
-  ----------
-  s^2 + 2610
+  354 s^2 + 70800 s + 3.54e06
+  ---------------------------
+               s
  
 Continuous-time transfer function.
 
-</pre><h2 id="2">Visualize system</h2><pre class="codeinput">figure
-pzmap(sys)
-
-figure
-step(sys)
-
-<span class="comment">%open loop</span>
-Gol = sys-(0.001*9.8)
-
-figure
-pzmap(Gol)
-</pre><pre class="codeoutput">
-Gol =
- 
-  -0.0098 s^2 - 23.62
-  -------------------
-      s^2 + 2610
- 
-Continuous-time transfer function.
-
-</pre><img vspace="5" hspace="5" src="firstSim_01.png" alt=""> <img vspace="5" hspace="5" src="firstSim_02.png" alt=""> <img vspace="5" hspace="5" src="firstSim_03.png" alt=""> <p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2019b</a><br></p></div><!--
+</pre><img vspace="5" hspace="5" src="firstSim_01.png" alt=""> <img vspace="5" hspace="5" src="firstSim_02.png" alt=""> <p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2019b</a><br></p></div><!--
 ##### SOURCE BEGIN #####
 %% Magnetic Levitation Project
 % Corey and Eamon
@@ -147,27 +142,40 @@ g = -9.81;      % Acceleration due to gravity
 %First we chose our 'b' setpoint for voltage
 %And find an a that cancels out the constant
 b = 5;
-a = abs(sqrt((5*mu*q1*N*A)/(4*pi*R*g)))
+a = abs(sqrt((5*mu*q1*N*A)/(4*pi*R*g)));
 
 %Z allows us to use cleaner math by placing
 %all of our constants into one constant.
-Z = (mu*q1*N*A)/(4*pi*R)
+Z = (mu*q1*N*A)/(4*pi*R);
 
 %Define the system
-sys = tf([Z/a^2],[1 0 Z*b/a^3])
+G = tf([Z/a^2],[1 0 Z*b/a^3]);
+%% Closed Loop
+close all
 
-%% Visualize system
+k = 354;
+kd = 1;
+kp = 200;
+ki = 10e3;
+H = 1;
+C = tf([kd,kp,ki],[1,0]);
+C = C*k
+
+% Visualize system
+% open loop
+Gol = C*G*H;
+
+% close loop
+CL = (C*G)/(1+C*G*H);
+
 figure
-pzmap(sys)
+subplot(2,1,1)
+pzmap(CL)
+subplot(2,1,2)
+rlocus(Gol)
 
 figure
-step(sys)
-
-%open loop
-Gol = sys-(0.001*9.8)
-
-figure
-pzmap(Gol)
+step(CL)
 
 ##### SOURCE END #####
 --></body></html>

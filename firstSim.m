@@ -25,21 +25,28 @@ Z = (mu*q1*N*A)/(4*pi*R);
 %Define the system
 G = tf([Z/a^2],[1 0 Z*b/a^3]);
 %% Closed Loop
-k = 1;
-H = 1;
-C = k;
+close all
 
+k = 354;
+kd = 1;
+kp = 200;
+ki = 10e3;
+H = 1;
+C = tf([kd,kp,ki],[1,0]);
+C = C*k
+
+% Visualize system
+% open loop
+Gol = C*G*H;
+
+% close loop
 CL = (C*G)/(1+C*G*H);
 
-%% Visualize system
 figure
-pzmap(1+C*G*H)
+subplot(2,1,1)
+pzmap(CL)
+subplot(2,1,2)
+rlocus(Gol)
 
 figure
 step(CL)
-
-%open loop
-Gol = C*G*H-(0.001*9.8);
-
-figure
-pzmap(Gol)
