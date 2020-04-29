@@ -16,24 +16,30 @@ g = -9.81;      % Acceleration due to gravity
 %First we chose our 'b' setpoint for voltage
 %And find an a that cancels out the constant
 b = 5;
-a = abs(sqrt((5*mu*q1*N*A)/(4*pi*R*g)))
+a = abs(sqrt((5*mu*q1*N*A)/(4*pi*R*g)));
 
 %Z allows us to use cleaner math by placing
 %all of our constants into one constant.
-Z = (mu*q1*N*A)/(4*pi*R)
+Z = (mu*q1*N*A)/(4*pi*R);
 
 %Define the system
-sys = tf([Z/a^2],[1 0 Z*b/a^3])
+G = tf([Z/a^2],[1 0 Z*b/a^3]);
+%% Closed Loop
+k = 1;
+H = 1;
+C = k;
+
+CL = (C*G)/(1+C*G*H);
 
 %% Visualize system
 figure
-pzmap(sys)
+pzmap(1+C*G*H)
 
 figure
-step(sys)
+step(CL)
 
 %open loop
-Gol = sys-(0.001*9.8)
+Gol = C*G*H-(0.001*9.8);
 
 figure
 pzmap(Gol)
