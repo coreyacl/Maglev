@@ -11,8 +11,8 @@ N = 4000;       % # of turns in solenoid
 A = 60;         % Area of solenoid in mm^2
 R = 2.41;       % Internal resistance of solenoid (5V/.6A) in Ohms
 g = -9.81;      % Acceleration due to gravity
-l = 
-L = (mu * N^2 * A)/l
+l = 112;
+L = 30e-3;
 
 %The setpoints for the linerization
 %First we chose our 'b' setpoint for voltage
@@ -29,28 +29,34 @@ G = tf([Z/a^2],[1 0 Z*b/a^3]);
 %% Closed Loop
 close all
 
-k = 15;
-kd = 1;
-kp = 200;
-ki = 10e3;
+k = 1;
+kd = 10000;
+kp = 50;
+ki = 1000;
 H = 1;
-Ac = tf([L 0],[R L]);
-C = tf([kd,kp,ki],[1,0]);
+Ac = tf([1],[L R])
+C = tf([kd,kp,ki],[1,0])
 C = C*k;
 M = 0.03;
 
 % Visualize system
 % open loop
-Gol = C*G*H;
+Gol = C*G*H*Ac;
 
 % close loop
 CL = (C*G*Ac)/(1+C*G*H*Ac) - 0.03;
 
-figure
-subplot(2,1,1)
-pzmap(CL)
-subplot(2,1,2)
-rlocus(Gol)
+%figure
+%subplot(2,1,1)
+%pzmap(CL)
+%subplot(2,1,2)
+%rlocus(Gol)
 
+%figure
+%step(CL)
 figure
-step(CL)
+rlocus(Gol)
+figure
+pzplot(C)
+%figure
+%step(Ac*G*C)

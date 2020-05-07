@@ -29,13 +29,13 @@ G = tf([Z/a^2],[1 0 Z*b/a^3]);
 %% Closed Loop
 close all
 
-k = 40;
-kd = 1;
-kp = 200;
-ki = 10;
+k = 2;
+kd = 1/2;
+kp = 50;
+ki = 2500;
 H = 1;
-Ac = tf([L 0],[R L])
-C = tf([kd,kp,ki],[1,0]);
+Ac = tf([1],[L R])
+C = tf([kd,kp,ki],[1,0])
 C = C*k;
 M = 0.03;
 
@@ -55,8 +55,8 @@ CL = (C*G*Ac)/(1+C*G*H*Ac) - 0.03;
 %figure
 %step(CL)
 figure
-rlocus(C*Ac*G)
+rlocus(Gol)
 figure
 pzplot(C)
 figure
-step(Ac*G)
+pzplot(Gol)
