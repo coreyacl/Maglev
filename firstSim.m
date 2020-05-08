@@ -6,9 +6,9 @@
 %https://www.daycounter.com/Calculators/Magnets/Solenoid-Force-Calculator.phtml
 %based off of https://media.digikey.com/pdf/Data%20Sheets/Adafruit%20PDFs/3875_Web.pdf
 mu = pi*4e-7;   % permeability of space
-q1 = .01e-3;       % Magnetic force of small magnet in Teslas
+q1 = .01e-6;       % Magnetic force of small magnet in Teslas
 N = 4000;       % # of turns in solenoid
-A = 60;         % Area of solenoid in mm^2
+A = 0.06;         % Area of solenoid in mm^2
 R = 2.41;       % Internal resistance of solenoid (5V/.6A) in Ohms
 g = -9.81;      % Acceleration due to gravity
 l = 112;
